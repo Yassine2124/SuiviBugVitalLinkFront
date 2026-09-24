@@ -1,0 +1,15 @@
+{
+  "login": "Connexion",
+  "register": "Créer un compte",
+  "email": "Email",
+  "password": "Mot de passe",
+  "name": "Nom",
+  "submit": "Valider",
+  "noAccount": "Pas encore de compte ?",
+  "haveAccount": "Déjà un compte ?",
+  "dashboard": "Tableau de bord",
+  "total": "Total",
+  "open": "Ouverts",
+  "resolved": "Résolus",
+  "newBug": "Nouveau bug"
+}

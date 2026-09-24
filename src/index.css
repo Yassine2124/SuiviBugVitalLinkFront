@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; margin: 0; background: #f7f7f5; color: #1a1a1a; }
+
+.btn { background: #1a1a1a; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.btn:hover { background: #333; }
+.btn-outline { background: transparent; border: 1px solid #ddd; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+
+.input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+
+.card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 20px; }
+
+.badge { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+.badge-red { background: #fbe4e4; color: #a32d2d; }
+.badge-amber { background: #fce9c9; color: #854f0b; }
+.badge-green { background: #e2eecb; color: #3b6d11; }
+.badge-blue { background: #d6e8fa; color: #185fa5; }
+
+.auth-page { max-width: 360px; margin: 80px auto; padding: 24px; }

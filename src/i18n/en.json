@@ -1,0 +1,15 @@
+{
+  "login": "Login",
+  "register": "Create account",
+  "email": "Email",
+  "password": "Password",
+  "name": "Name",
+  "submit": "Submit",
+  "noAccount": "Don't have an account?",
+  "haveAccount": "Already have an account?",
+  "dashboard": "Dashboard",
+  "total": "Total",
+  "open": "Open",
+  "resolved": "Resolved",
+  "newBug": "New bug"
+}

@@ -11,13 +11,13 @@ export function AuthProvider({ children }) {
   });
   const [token, setToken] = useState(() => localStorage.getItem('token'));
 
-  const login = async (email, password) => {
-    const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-    setUser(res.data.user);
-    setToken(res.data.token);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
-    localStorage.setItem('token', res.data.token);
-  };
+ const login = async (email, password) => {
+  const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+  setUser(res.data.user);
+  setToken(res.data.token);
+  localStorage.setItem('user', JSON.stringify(res.data.user));
+  localStorage.setItem('token', res.data.token);
+};
 
   const register = async (name, email, password) => {
     await axios.post(`${API_URL}/auth/register`, { name, email, password });

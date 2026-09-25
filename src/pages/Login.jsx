@@ -10,26 +10,46 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Erreur de connexion');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 360, margin: '80px auto' }}>
-      <h2>{t('login')}</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <input type="email" placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} required style={{ width: '100%', marginBottom: 10, padding: 8 }} />
-      <input type="password" placeholder={t('password')} value={password} onChange={e => setPassword(e.target.value)} required style={{ width: '100%', marginBottom: 10, padding: 8 }} />
-      <button type="submit" style={{ width: '100%', padding: 8 }}>{t('submit')}</button>
-      <p><Link to="/register">{t('noAccount')}</Link></p>
-    </form>
+    <div className="auth-shell">
+      <div className="auth-box">
+        <p className="auth-title">Suivi des bugs VitalLink</p>
+        <p className="auth-subtitle">{t('login')} à votre espace</p>
+
+        {error && <div className="auth-error">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <label className="field-label">{t('email')}</label>
+          <input type="email" className="input" placeholder="nom@vitallink.com" value={email} onChange={e => setEmail(e.target.value)} required />
+
+          <label className="field-label">{t('password')}</label>
+          <input type="password" className="input" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+
+          <button type="submit" className="btn" style={{ width: '100%', marginTop: 6 }} disabled={loading}>
+            {loading ? '...' : t('login')}
+          </button>
+        </form>
+
+        <p style={{ textAlign: 'center', fontSize: 14, color: '#777', marginTop: 22, marginBottom: 0 }}>
+          {t('noAccount')} <Link to="/register" className="auth-link">{t('register')}</Link>
+        </p>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Bug, User, Calendar, Grid, Layers, TrendingUp, Clock, Pencil } from 'lucide-react';
+import { Bug, User, Calendar, Grid, Layers, Clock, Pencil } from 'lucide-react';
 
 export default function BugDetail({ bug, onClose, onEdit }) {
   const { t, i18n } = useTranslation();
@@ -8,6 +8,9 @@ export default function BugDetail({ bug, onClose, onEdit }) {
 
   const priorityBadge = (p) => p === 'Haute' ? 'badge-red' : p === 'Moyenne' ? 'badge-amber' : 'badge-green';
   const statusBadge = (s) => s === 'Résolu' ? 'badge-green' : s === 'En cours' ? 'badge-blue' : s === 'Bloqué' ? 'badge-red' : 'badge-amber';
+
+  const priorityLabel = (p) => ({ Haute: t('prioHigh'), Moyenne: t('prioMedium'), Basse: t('prioLow') }[p] || p);
+  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -25,13 +28,13 @@ export default function BugDetail({ bug, onClose, onEdit }) {
 
         <div className="modal-body">
           <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
-            <span className={`badge ${priorityBadge(bug.priority)}`}>{bug.priority}</span>
-            <span className={`badge ${statusBadge(bug.status)}`}>{bug.status}</span>
+            <span className={`badge ${priorityBadge(bug.priority)}`}>{priorityLabel(bug.priority)}</span>
+            <span className={`badge ${statusBadge(bug.status)}`}>{statusLabel(bug.status)}</span>
           </div>
 
           <label className="field-label-icon" style={{ marginBottom: 8 }}>{t('columnDescription')}</label>
           <p style={{ fontSize: 14, color: '#444', lineHeight: 1.6, whiteSpace: 'pre-wrap', background: '#f7f7f5', padding: 14, borderRadius: 10, marginTop: 0 }}>
-            {bug.description || 'Aucune description fournie.'}
+           {bug.description || t('noDescription')}
           </p>
 
           <div className="field-row" style={{ marginTop: 18 }}>

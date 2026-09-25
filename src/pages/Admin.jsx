@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, Check, Eye, Plus, Pencil, Trash2 } from 'lucide-react';
 import api from '../api/axios';
 import Sidebar from '../components/Sidebar';
 
 export default function Admin() {
+  const { t } = useTranslation();
   const [pending, setPending] = useState([]);
   const [users, setUsers] = useState([]);
 
@@ -33,14 +35,14 @@ export default function Admin() {
           <div className="page-title-row" style={{ marginBottom: 22 }}>
             <div className="page-icon"><Users size={22} /></div>
             <div>
-              <h2 className="page-title">Gestion des utilisateurs</h2>
-              <p className="page-subtitle">Validez les comptes et contrôlez les permissions de chacun.</p>
+              <h2 className="page-title">{t('adminTitle')}</h2>
+              <p className="page-subtitle">{t('adminSubtitle')}</p>
             </div>
           </div>
 
           {pending.length > 0 && (
             <div className="card" style={{ marginBottom: 20 }}>
-              <h3 style={{ marginTop: 0, fontSize: 15 }}>Comptes en attente ({pending.length})</h3>
+              <h3 style={{ marginTop: 0, fontSize: 15 }}>{t('pendingAccounts')} ({pending.length})</h3>
               {pending.map(u => (
                 <div key={u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
                   <div>
@@ -48,7 +50,7 @@ export default function Admin() {
                     <div style={{ fontSize: 13, color: '#666' }}>{u.email}</div>
                   </div>
                   <button className="btn" onClick={() => approve(u._id)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Check size={15} /> Approuver
+                    <Check size={15} /> {t('approve')}
                   </button>
                 </div>
               ))}
@@ -59,11 +61,11 @@ export default function Admin() {
             <table className="data-table" style={{ minWidth: 700 }}>
               <thead>
                 <tr>
-                  <th>Utilisateur</th>
-                  <th style={{ textAlign: 'center' }}><Eye size={14} /> Voir</th>
-                  <th style={{ textAlign: 'center' }}><Plus size={14} /> Créer</th>
-                  <th style={{ textAlign: 'center' }}><Pencil size={14} /> Modifier</th>
-                  <th style={{ textAlign: 'center' }}><Trash2 size={14} /> Supprimer</th>
+                  <th>{t('columnUser')}</th>
+                  <th style={{ textAlign: 'center' }}><Eye size={14} /> {t('permCanView')}</th>
+                  <th style={{ textAlign: 'center' }}><Plus size={14} /> {t('permCanCreate')}</th>
+                  <th style={{ textAlign: 'center' }}><Pencil size={14} /> {t('permCanEdit')}</th>
+                  <th style={{ textAlign: 'center' }}><Trash2 size={14} /> {t('permCanDelete')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,7 +83,7 @@ export default function Admin() {
                   </tr>
                 ))}
                 {users.length === 0 && (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', color: '#999', padding: 30 }}>Aucun utilisateur validé pour le moment.</td></tr>
+                  <tr><td colSpan={5} style={{ textAlign: 'center', color: '#999', padding: 30 }}>{t('noUsers')}</td></tr>
                 )}
               </tbody>
             </table>

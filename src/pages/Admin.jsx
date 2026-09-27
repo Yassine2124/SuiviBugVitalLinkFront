@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Check, Eye, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Users, Check, Eye, Plus, Pencil, Trash2, Menu } from 'lucide-react';
 import api from '../api/axios';
 import Sidebar from '../components/Sidebar';
 
@@ -8,6 +8,7 @@ export default function Admin() {
   const { t } = useTranslation();
   const [pending, setPending] = useState([]);
   const [users, setUsers] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchData = () => {
     api.get('/auth/pending').then(res => setPending(res.data));
@@ -29,9 +30,13 @@ export default function Admin() {
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="main-area">
+        <div className="topbar" style={{ display: 'none' }} />
         <div className="page-content" style={{ maxWidth: 1000 }}>
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)} style={{ marginBottom: 12 }}>
+            <Menu size={22} />
+          </button>
           <div className="page-title-row" style={{ marginBottom: 22 }}>
             <div className="page-icon"><Users size={22} /></div>
             <div>
@@ -44,7 +49,7 @@ export default function Admin() {
             <div className="card" style={{ marginBottom: 20 }}>
               <h3 style={{ marginTop: 0, fontSize: 15 }}>{t('pendingAccounts')} ({pending.length})</h3>
               {pending.map(u => (
-                <div key={u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
+                <div key={u._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f0f0f0', flexWrap: 'wrap', gap: 8 }}>
                   <div>
                     <div style={{ fontWeight: 500 }}>{u.name}</div>
                     <div style={{ fontSize: 13, color: '#666' }}>{u.email}</div>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Clock, CheckCircle2, Search, Bell, Bug, Send, MoreVertical, Pencil, Trash2, Eye } from 'lucide-react';
+import { AlertCircle, Clock, CheckCircle2, Search, Bell, Bug, Send, MoreVertical, Pencil, Trash2, Eye, Menu } from 'lucide-react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import BugForm from '../components/BugForm';
@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterPlatform, setFilterPlatform] = useState('');
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuRef = useRef(null);
 
   const fetchBugs = () => {
@@ -84,10 +85,13 @@ export default function Dashboard() {
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="main-area">
         <div className="topbar">
+          <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu size={22} />
+          </button>
           <div className="search-bar">
             <Search size={16} />
             <input placeholder={t('searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)} style={{ border: 'none', background: 'none', outline: 'none', flex: 1, fontSize: 14 }} />

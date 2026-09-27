@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertCircle, Clock, CheckCircle2, Search, Bell, Bug, Send, MoreVertical, Pencil, Trash2, Eye, Menu } from 'lucide-react';
+import { AlertCircle, Clock, CheckCircle2, Search, Bell, Bug, Send, MoreVertical, Pencil, Trash2, Eye, Menu, FlaskConical } from 'lucide-react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import BugForm from '../components/BugForm';
 import BugDetail from '../components/BugDetail';
 import Sidebar from '../components/Sidebar';
+import TesterAssignModal from '../components/TesterAssignModal';
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [viewingBug, setViewingBug] = useState(null);
   const [selectedBug, setSelectedBug] = useState(null);
+  const [testingBug, setTestingBug] = useState(null);
   const [search, setSearch] = useState('');
   const [filterPriority, setFilterPriority] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -39,13 +41,14 @@ export default function Dashboard() {
   const total = bugs.length;
   const open = bugs.filter(b => b.status === 'Ouvert').length;
   const inProgress = bugs.filter(b => b.status === 'En cours').length;
+  const inTest = bugs.filter(b => b.status === 'En test').length;
   const resolved = bugs.filter(b => b.status === 'Résolu').length;
 
   const priorityBadge = (p) => p === 'Haute' ? 'badge-red' : p === 'Moyenne' ? 'badge-amber' : 'badge-green';
-  const statusBadge = (s) => s === 'Résolu' ? 'badge-green' : s === 'En cours' ? 'badge-blue' : s === 'Bloqué' ? 'badge-red' : 'badge-amber';
+  const statusBadge = (s) => s === 'Résolu' ? 'badge-green' : s === 'En cours' ? 'badge-blue' : s === 'En test' ? 'badge-gray' : s === 'Bloqué' ? 'badge-red' : 'badge-amber';
 
   const priorityLabel = (p) => ({ Haute: t('prioHigh'), Moyenne: t('prioMedium'), Basse: t('prioLow') }[p] || p);
-  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
+  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), 'En test': t('statusTest'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
   const platformLabel = (p) => ({ Web: t('platWeb'), Mobile: t('platMobile'), 'Web & Mobile': t('platBoth') }[p] || p);
   const categoryLabel = (c) => ({ Bug: t('catBug'), Amélioration: t('catImprovement'), 'Nouvelle fonctionnalité': t('catFeature') }[c] || c);
 
@@ -126,7 +129,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14, marginBottom: 20 }}>
             <div className="stat-card">
               <div className="stat-icon" style={{ background: '#ececff', color: '#4338ca' }}><Bug size={20} /></div>
               <div><div className="stat-value">{total}</div><div className="stat-label">{t('total')}</div></div>
@@ -138,6 +141,10 @@ export default function Dashboard() {
             <div className="stat-card">
               <div className="stat-icon blue"><Clock size={20} /></div>
               <div><div className="stat-value">{inProgress}</div><div className="stat-label">{t('statusProgress')}</div></div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: '#f3e8ff', color: '#7e22ce' }}><FlaskConical size={20} /></div>
+              <div><div className="stat-value">{inTest}</div><div className="stat-label">{t('statusTest')}</div></div>
             </div>
             <div className="stat-card">
               <div className="stat-icon green"><CheckCircle2 size={20} /></div>
@@ -156,6 +163,7 @@ export default function Dashboard() {
               <option value="">{t('allStatuses')}</option>
               <option value="Ouvert">{t('statusOpen')}</option>
               <option value="En cours">{t('statusProgress')}</option>
+              <option value="En test">{t('statusTest')}</option>
               <option value="Bloqué">{t('statusBlocked')}</option>
               <option value="Résolu">{t('statusResolved')}</option>
             </select>
@@ -168,11 +176,11 @@ export default function Dashboard() {
           </div>
 
           <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
-            <table className="data-table" style={{ minWidth: 1300 }}>
+            <table className="data-table" style={{ minWidth: 1400 }}>
               <thead>
                 <tr>
                   <th>{t('columnId')}</th><th>{t('title')}</th><th>{t('columnDescription')}</th><th>{t('category')}</th><th>{t('platform')}</th>
-                  <th>{t('priority')}</th><th>{t('status')}</th><th>{t('assignedTo')}</th><th>{t('columnCreated')}</th><th>{t('columnDue')}</th><th>{t('columnDaysLeft')}</th><th>{t('columnActions')}</th>
+                  <th>{t('priority')}</th><th>{t('status')}</th><th>{t('assignedTo')}</th><th>{t('tester')}</th><th>{t('columnCreated')}</th><th>{t('columnDue')}</th><th>{t('columnDaysLeft')}</th><th>{t('columnActions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -195,6 +203,14 @@ export default function Dashboard() {
                           </div>
                         ) : '—'}
                       </td>
+                      <td>
+                        {bug.testers && bug.testers.length > 0 ? (
+                          <div style={{ fontSize: 13 }}>
+                            {bug.testers.slice(0, 2).join(', ')}
+                            {bug.testers.length > 2 && ` +${bug.testers.length - 2}`}
+                          </div>
+                        ) : '—'}
+                      </td>
                       <td style={{ color: '#888' }}>{formatDate(bug.dateAdded || bug.createdAt)}</td>
                       <td style={{ color: '#888' }}>{formatDate(bug.dueDate)}</td>
                       <td>
@@ -212,6 +228,11 @@ export default function Dashboard() {
                               <button className="action-menu-item" onClick={() => { setViewingBug(bug); setOpenMenuId(null); }}>
                                 <Eye size={14} /> {t('actionView')}
                               </button>
+                              {canEdit && bug.status !== 'Résolu' && (
+                                <button className="action-menu-item" onClick={() => { setTestingBug(bug); setOpenMenuId(null); }}>
+                                  <FlaskConical size={14} /> Envoyer en test
+                                </button>
+                              )}
                               {canEdit && (
                                 <button className="action-menu-item" onClick={() => { setSelectedBug(bug); setShowForm(true); setOpenMenuId(null); }}>
                                   <Pencil size={14} /> {t('actionEdit')}
@@ -230,7 +251,7 @@ export default function Dashboard() {
                   );
                 })}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={12} style={{ textAlign: 'center', color: '#999', padding: 30 }}>{t('noResults')}</td></tr>
+                  <tr><td colSpan={13} style={{ textAlign: 'center', color: '#999', padding: 30 }}>{t('noResults')}</td></tr>
                 )}
               </tbody>
             </table>
@@ -243,6 +264,10 @@ export default function Dashboard() {
       )}
 
       {showForm && <BugForm bug={selectedBug} onCreated={() => { setShowForm(false); setSelectedBug(null); fetchBugs(); }} onClose={() => { setShowForm(false); setSelectedBug(null); }} />}
+
+      {testingBug && (
+        <TesterAssignModal bug={testingBug} onClose={() => setTestingBug(null)} onAssigned={() => { setTestingBug(null); fetchBugs(); }} />
+      )}
     </div>
   );
 }

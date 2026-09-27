@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bug, User, Calendar, Type, FileText, Grid, Layers, TrendingUp, Clock, Send } from 'lucide-react';
-import api from '../api/axios';
+import { Bug, User, Calendar, Type, FileText, Grid, Layers, TrendingUp, Clock, Send, Image as ImageIcon, X } from 'lucide-react';
+import api, { uploadImage } from '../api/axios';
 
 export default function BugForm({ bug, onCreated, onClose }) {
   const { t } = useTranslation();
@@ -9,23 +9,39 @@ export default function BugForm({ bug, onCreated, onClose }) {
     taskId: bug.taskId, title: bug.title, description: bug.description || '',
     category: bug.category, platform: bug.platform, priority: bug.priority,
     status: bug.status, assignedTo: bug.assignedTo || '',
-    dueDate: bug.dueDate ? bug.dueDate.slice(0, 10) : ''
+    dueDate: bug.dueDate ? bug.dueDate.slice(0, 10) : '', imageUrl: bug.imageUrl || ''
   } : {
     taskId: '', title: '', description: '',
     category: 'Bug', platform: 'Web', priority: 'Moyenne',
-    status: 'Ouvert', assignedTo: '', dueDate: ''
+    status: 'Ouvert', assignedTo: '', dueDate: '', imageUrl: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const url = await uploadImage(file);
+      setForm({ ...form, imageUrl: url });
+    } catch (err) {
+      setError('Échec de l\'upload de l\'image');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      if (bug) await api.put(`/bugs/${bug._id}`, form);
+      if (bug) await api.put(`/bugs/${bug._id}`, { ...bug, ...form });
       else await api.post('/bugs', form);
       onCreated();
     } catch (err) {
@@ -42,7 +58,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
   };
 
   const priorityColor = { Haute: '#fbe9e4', Moyenne: '#fdf1de', Basse: '#eaf3de' }[form.priority];
-  const statusColor = { 'Ouvert': '#e2f4ec', 'En cours': '#e6f1fb', 'Bloqué': '#fbe9e4', 'Résolu': '#eaf3de' }[form.status];
+  const statusColor = { 'Ouvert': '#e2f4ec', 'En cours': '#e6f1fb', 'En test': '#f3e8ff', 'Bloqué': '#fbe9e4', 'Résolu': '#eaf3de' }[form.status];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -61,6 +77,21 @@ export default function BugForm({ bug, onCreated, onClose }) {
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             {error && <div className="auth-error">{error}</div>}
+
+            <label className="field-label-icon"><ImageIcon size={15} /> Capture d'écran</label>
+            {form.imageUrl ? (
+              <div style={{ position: 'relative', marginBottom: 14 }}>
+                <img src={form.imageUrl} alt="Aperçu" style={{ width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 10, border: '1px solid #e0e0dc' }} />
+                <button type="button" onClick={() => setForm({ ...form, imageUrl: '' })} style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <X size={14} color="white" />
+                </button>
+              </div>
+            ) : (
+              <div style={{ marginBottom: 14 }}>
+                <input type="file" accept="image/*" onChange={handleFileChange} className="input" style={{ padding: 8 }} />
+                {uploading && <p style={{ fontSize: 12, color: '#777', margin: '4px 0 0' }}>Upload en cours...</p>}
+              </div>
+            )}
 
             <div className="field-row">
               <div>
@@ -110,9 +141,17 @@ export default function BugForm({ bug, onCreated, onClose }) {
               </div>
               <div>
                 <label className="field-label-icon"><Clock size={15} /> {t('status')}</label>
+                {/* <select className="input" name="status" value={form.status} onChange={handleChange} style={{ background: statusColor, borderColor: 'transparent' }}>
+                  <option value="Ouvert">{t('statusOpen')}</option>
+                  <option value="En cours">{t('statusProgress')}</option>
+                  <option value="En test">{t('statusTest')}</option>
+                  <option value="Bloqué">{t('statusBlocked')}</option>
+                  <option value="Résolu">{t('statusResolved')}</option>
+                </select> */}
                 <select className="input" name="status" value={form.status} onChange={handleChange} style={{ background: statusColor, borderColor: 'transparent' }}>
                   <option value="Ouvert">{t('statusOpen')}</option>
                   <option value="En cours">{t('statusProgress')}</option>
+                  {form.status === 'En test' && <option value="En test">{t('statusTest')}</option>}
                   <option value="Bloqué">{t('statusBlocked')}</option>
                   <option value="Résolu">{t('statusResolved')}</option>
                 </select>
@@ -125,7 +164,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
 
           <div className="modal-footer">
             <button type="button" className="btn-outline" style={{ flex: 1 }} onClick={onClose}>{t('cancel')}</button>
-            <button type="submit" className="btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4338ca' }} disabled={loading}>
+            <button type="submit" className="btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4338ca' }} disabled={loading || uploading}>
               <Send size={15} /> {loading ? '...' : (bug ? t('saveBug') : t('createBug'))}
             </button>
           </div>

@@ -78,5 +78,8 @@
   "permCanCreate": "Créer",
   "permCanEdit": "Modifier",
   "permCanDelete": "Supprimer",
-  "noUsers": "Aucun utilisateur validé pour le moment."
+  "noUsers": "Aucun utilisateur validé pour le moment.",
+  "statusTest": "En test",
+  "tester": "Testeur assigné",
+  "testerPlaceholder": "Nom du testeur"
 }

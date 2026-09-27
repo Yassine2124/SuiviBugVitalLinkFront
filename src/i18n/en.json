@@ -78,5 +78,8 @@
   "permCanCreate": "Create",
   "permCanEdit": "Edit",
   "permCanDelete": "Delete",
-  "noUsers": "No approved users yet."
+  "noUsers": "No approved users yet.",
+  "statusTest": "In testing",
+  "tester": "Assigned tester",
+  "testerPlaceholder": "Tester's name"
 }

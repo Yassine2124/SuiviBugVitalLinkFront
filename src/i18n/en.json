@@ -81,5 +81,15 @@
   "noUsers": "No approved users yet.",
   "statusTest": "In testing",
   "tester": "Assigned tester",
-  "testerPlaceholder": "Tester's name"
+  "testerPlaceholder": "Tester's name",
+  "screenshot": "Screenshot",
+  "uploadError": "Image upload failed",
+  "uploading": "Uploading...",
+  "sendToTest": "Send to testing",
+  "assignTesters": "Assign to one or more testers",
+  "noMembers": "No members available.",
+  "selectAtLeastOneTester": "Select at least one tester",
+  "adminLabel": "(admin)",
+  "testers": "Testers",
+  "preview": "Preview"
 }

@@ -34,7 +34,7 @@ export default function BugDetail({ bug, onClose, onEdit }) {
               <div style={{ position: 'relative', marginBottom: 18 }}>
                 <img src={bug.imageUrl} alt="Capture du bug" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', borderRadius: 10, border: '1px solid #e0e0dc', display: 'block' }} />
                 <button type="button" onClick={() => setShowFullImage(true)} className="btn-outline" style={{ position: 'absolute', bottom: 10, right: 10, display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', fontSize: 12 }}>
-                  <Maximize2 size={13} /> Aperçu
+                  <Maximize2 size={13} /> {t('preview')}
                 </button>
               </div>
             )}
@@ -66,7 +66,7 @@ export default function BugDetail({ bug, onClose, onEdit }) {
                 <p style={{ margin: 0, fontSize: 14 }}>{bug.assignedTo || '—'}</p>
               </div>
               <div>
-                <label className="field-label-icon"><User size={15} /> Testeurs</label>
+               <label className="field-label-icon"><User size={15} /> {t('testers')}</label>
                 <p style={{ margin: 0, fontSize: 14 }}>{bug.testers && bug.testers.length > 0 ? bug.testers.join(', ') : '—'}</p>
               </div>
             </div>

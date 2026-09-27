@@ -30,7 +30,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
       const url = await uploadImage(file);
       setForm({ ...form, imageUrl: url });
     } catch (err) {
-      setError('Échec de l\'upload de l\'image');
+      setError(t('uploadError'));
     } finally {
       setUploading(false);
     }
@@ -78,7 +78,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
           <div className="modal-body">
             {error && <div className="auth-error">{error}</div>}
 
-            <label className="field-label-icon"><ImageIcon size={15} /> Capture d'écran</label>
+            <label className="field-label-icon"><ImageIcon size={15} /> {t('screenshot')}</label>
             {form.imageUrl ? (
               <div style={{ position: 'relative', marginBottom: 14 }}>
                 <img src={form.imageUrl} alt="Aperçu" style={{ width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 10, border: '1px solid #e0e0dc' }} />
@@ -89,7 +89,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
             ) : (
               <div style={{ marginBottom: 14 }}>
                 <input type="file" accept="image/*" onChange={handleFileChange} className="input" style={{ padding: 8 }} />
-                {uploading && <p style={{ fontSize: 12, color: '#777', margin: '4px 0 0' }}>Upload en cours...</p>}
+                {uploading && <p style={{ fontSize: 12, color: '#777', margin: '4px 0 0' }}>{t('uploading')}</p>}
               </div>
             )}
 

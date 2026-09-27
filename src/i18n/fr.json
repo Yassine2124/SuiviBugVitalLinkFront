@@ -81,5 +81,15 @@
   "noUsers": "Aucun utilisateur validé pour le moment.",
   "statusTest": "En test",
   "tester": "Testeur assigné",
-  "testerPlaceholder": "Nom du testeur"
+  "testerPlaceholder": "Nom du testeur",
+  "screenshot": "Capture d'écran",
+  "uploadError": "Échec de l'upload de l'image",
+  "uploading": "Upload en cours...",
+  "sendToTest": "Envoyer en test",
+  "assignTesters": "Assigner à un ou plusieurs testeurs",
+  "noMembers": "Aucun membre disponible.",
+  "selectAtLeastOneTester": "Sélectionne au moins un testeur",
+  "adminLabel": "(admin)",
+  "testers": "Testeurs",
+  "preview": "Aperçu"
 }

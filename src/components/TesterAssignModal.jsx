@@ -20,7 +20,7 @@ export default function TesterAssignModal({ bug, onClose, onAssigned }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (selected.length === 0) { setError('Sélectionne au moins un testeur'); return; }
+    if (selected.length === 0) { setError(t('selectAtLeastOneTester')); return; }
     setLoading(true);
     setError('');
     try {
@@ -40,7 +40,7 @@ export default function TesterAssignModal({ bug, onClose, onAssigned }) {
           <div style={{ display: 'flex', gap: 14 }}>
             <div className="modal-icon" style={{ background: '#7e22ce' }}><FlaskConical size={22} /></div>
             <div>
-              <h3>Envoyer en test</h3>
+              <h3>{t('sendToTest')}</h3>
               <p style={{ margin: '4px 0 0', fontSize: 13, color: '#777' }}>{bug.taskId} — {bug.title}</p>
             </div>
           </div>
@@ -50,7 +50,7 @@ export default function TesterAssignModal({ bug, onClose, onAssigned }) {
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             {error && <div className="auth-error">{error}</div>}
-            <label className="field-label-icon"><User size={15} /> Assigner à un ou plusieurs testeurs</label>
+            <label className="field-label-icon"><User size={15} /> {t('assignTesters')}</label>
             <div style={{ border: '1px solid #e0e0dc', borderRadius: 10, maxHeight: 220, overflowY: 'auto' }}>
               {members.map(m => {
                 const isChecked = selected.includes(m.name);
@@ -63,17 +63,17 @@ export default function TesterAssignModal({ bug, onClose, onAssigned }) {
                     <div style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${isChecked ? '#7e22ce' : '#ccc'}`, background: isChecked ? '#7e22ce' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {isChecked && <Check size={12} color="white" />}
                     </div>
-                    <span style={{ fontSize: 14 }}>{m.name}{m.role === 'admin' ? ' (admin)' : ''}</span>
+                    <span style={{ fontSize: 14 }}>{m.name}{m.role === 'admin' ? ` ${t('adminLabel')}` : ''}</span>
                   </div>
                 );
               })}
-              {members.length === 0 && <div style={{ padding: 14, fontSize: 13, color: '#999' }}>Aucun membre disponible.</div>}
+              {members.length === 0 && <div style={{ padding: 14, fontSize: 13, color: '#999' }}>{t('noMembers')}</div>}
             </div>
           </div>
           <div className="modal-footer">
             <button type="button" className="btn-outline" style={{ flex: 1 }} onClick={onClose}>{t('cancel')}</button>
             <button type="submit" className="btn" style={{ flex: 1, background: '#7e22ce' }} disabled={loading}>
-              {loading ? '...' : 'Envoyer en test'}
+              {loading ? '...' : t('sendToTest')}
             </button>
           </div>
         </form>

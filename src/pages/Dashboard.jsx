@@ -230,7 +230,7 @@ export default function Dashboard() {
                               </button>
                               {canEdit && bug.status !== 'Résolu' && (
                                 <button className="action-menu-item" onClick={() => { setTestingBug(bug); setOpenMenuId(null); }}>
-                                  <FlaskConical size={14} /> Envoyer en test
+                                  <FlaskConical size={14} /> {t('sendToTest')}
                                 </button>
                               )}
                               {canEdit && (

@@ -1,18 +1,25 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bug, User, Calendar, Grid, Layers, Clock, Pencil, Maximize2, X } from 'lucide-react';
+import { Bug, User, Calendar, Grid, Layers, Clock, Pencil, Maximize2, X, Copy, Check } from 'lucide-react';
 
 export default function BugDetail({ bug, onClose, onEdit }) {
   const { t, i18n } = useTranslation();
   const [showFullImage, setShowFullImage] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const formatDate = (d) => d ? new Date(d).toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
 
   const priorityBadge = (p) => p === 'Haute' ? 'badge-red' : p === 'Moyenne' ? 'badge-amber' : 'badge-green';
-  const statusBadge = (s) => s === 'Résolu' ? 'badge-green' : s === 'En cours' ? 'badge-blue' : s === 'En test' ? 'badge-gray' : s === 'Bloqué' ? 'badge-red' : 'badge-amber';
+  const statusBadge = (s) => s === 'Résolu' ? 'badge-green' : s === 'En cours' ? 'badge-blue' : s === 'En test' ? 'badge-gray' : s === 'Dev terminé' ? 'badge-blue' : s === 'Bloqué' ? 'badge-red' : 'badge-amber';
 
   const priorityLabel = (p) => ({ Haute: t('prioHigh'), Moyenne: t('prioMedium'), Basse: t('prioLow') }[p] || p);
-  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), 'En test': t('statusTest'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
+  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), 'Dev terminé': t('statusDevDone'), 'En test': t('statusTest'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(bug.description || '');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
 
   return (
     <>
@@ -44,7 +51,12 @@ export default function BugDetail({ bug, onClose, onEdit }) {
               <span className={`badge ${statusBadge(bug.status)}`}>{statusLabel(bug.status)}</span>
             </div>
 
-            <label className="field-label-icon" style={{ marginBottom: 8 }}>{t('columnDescription')}</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label className="field-label-icon" style={{ marginBottom: 0 }}>{t('columnDescription')}</label>
+              <button type="button" onClick={handleCopy} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', fontSize: 12 }}>
+                {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? t('copied') : t('copy')}
+              </button>
+            </div>
             <p style={{ fontSize: 14, color: '#444', lineHeight: 1.6, whiteSpace: 'pre-wrap', background: '#f7f7f5', padding: 14, borderRadius: 10, marginTop: 0 }}>
               {bug.description || t('noDescription')}
             </p>
@@ -66,7 +78,7 @@ export default function BugDetail({ bug, onClose, onEdit }) {
                 <p style={{ margin: 0, fontSize: 14 }}>{bug.assignedTo || '—'}</p>
               </div>
               <div>
-               <label className="field-label-icon"><User size={15} /> {t('testers')}</label>
+                <label className="field-label-icon"><User size={15} /> {t('testers')}</label>
                 <p style={{ margin: 0, fontSize: 14 }}>{bug.testers && bug.testers.length > 0 ? bug.testers.join(', ') : '—'}</p>
               </div>
             </div>
@@ -78,7 +90,9 @@ export default function BugDetail({ bug, onClose, onEdit }) {
               </div>
               <div>
                 <label className="field-label-icon"><Clock size={15} /> {t('columnCreated')}</label>
-                <p style={{ margin: 0, fontSize: 14 }}>{formatDate(bug.dateAdded || bug.createdAt)}</p>
+                <p style={{ margin: 0, fontSize: 14 }}>
+                  {formatDate(bug.dateAdded || bug.createdAt)}{bug.createdBy ? ` ${t('by')} ${bug.createdBy}` : ''}
+                </p>
               </div>
             </div>
           </div>

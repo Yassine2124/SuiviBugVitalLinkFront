@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bug, User, Calendar, Type, FileText, Grid, Layers, TrendingUp, Clock, Send, Image as ImageIcon, X } from 'lucide-react';
 import api, { uploadImage } from '../api/axios';
 
 export default function BugForm({ bug, onCreated, onClose }) {
   const { t } = useTranslation();
+  const [members, setMembers] = useState([]);
   const [form, setForm] = useState(bug ? {
     taskId: bug.taskId, title: bug.title, description: bug.description || '',
     category: bug.category, platform: bug.platform, priority: bug.priority,
@@ -18,6 +19,10 @@ export default function BugForm({ bug, onCreated, onClose }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    api.get('/auth/team').then(res => setMembers(res.data)).catch(() => {});
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -58,7 +63,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
   };
 
   const priorityColor = { Haute: '#fbe9e4', Moyenne: '#fdf1de', Basse: '#eaf3de' }[form.priority];
-  const statusColor = { 'Ouvert': '#e2f4ec', 'En cours': '#e6f1fb', 'En test': '#f3e8ff', 'Bloqué': '#fbe9e4', 'Résolu': '#eaf3de' }[form.status];
+  const statusColor = { 'Ouvert': '#e2f4ec', 'En cours': '#e6f1fb', 'Dev terminé': '#e0f2fe', 'En test': '#f3e8ff', 'Bloqué': '#fbe9e4', 'Résolu': '#eaf3de' }[form.status];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -141,16 +146,10 @@ export default function BugForm({ bug, onCreated, onClose }) {
               </div>
               <div>
                 <label className="field-label-icon"><Clock size={15} /> {t('status')}</label>
-                {/* <select className="input" name="status" value={form.status} onChange={handleChange} style={{ background: statusColor, borderColor: 'transparent' }}>
-                  <option value="Ouvert">{t('statusOpen')}</option>
-                  <option value="En cours">{t('statusProgress')}</option>
-                  <option value="En test">{t('statusTest')}</option>
-                  <option value="Bloqué">{t('statusBlocked')}</option>
-                  <option value="Résolu">{t('statusResolved')}</option>
-                </select> */}
                 <select className="input" name="status" value={form.status} onChange={handleChange} style={{ background: statusColor, borderColor: 'transparent' }}>
                   <option value="Ouvert">{t('statusOpen')}</option>
                   <option value="En cours">{t('statusProgress')}</option>
+                  <option value="Dev terminé">{t('statusDevDone')}</option>
                   {form.status === 'En test' && <option value="En test">{t('statusTest')}</option>}
                   <option value="Bloqué">{t('statusBlocked')}</option>
                   <option value="Résolu">{t('statusResolved')}</option>
@@ -159,7 +158,10 @@ export default function BugForm({ bug, onCreated, onClose }) {
             </div>
 
             <label className="field-label-icon"><User size={15} /> {t('assignedTo')}</label>
-            <input className="input" name="assignedTo" placeholder={t('assignedToPlaceholder')} value={form.assignedTo} onChange={handleChange} style={{ marginBottom: 0 }} />
+            <select className="input" name="assignedTo" value={form.assignedTo} onChange={handleChange} style={{ marginBottom: 0 }}>
+              <option value="">—</option>
+              {members.map(m => <option key={m._id} value={m.name}>{m.name}</option>)}
+            </select>
           </div>
 
           <div className="modal-footer">

@@ -48,7 +48,7 @@ export default function Dashboard() {
   const statusBadge = (s) => s === 'Résolu' ? 'badge-green' : s === 'En cours' ? 'badge-blue' : s === 'En test' ? 'badge-gray' : s === 'Bloqué' ? 'badge-red' : 'badge-amber';
 
   const priorityLabel = (p) => ({ Haute: t('prioHigh'), Moyenne: t('prioMedium'), Basse: t('prioLow') }[p] || p);
-  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), 'En test': t('statusTest'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
+  const statusLabel = (s) => ({ Ouvert: t('statusOpen'), 'En cours': t('statusProgress'), 'Dev terminé': t('statusDevDone'), 'En test': t('statusTest'), Bloqué: t('statusBlocked'), Résolu: t('statusResolved') }[s] || s);
   const platformLabel = (p) => ({ Web: t('platWeb'), Mobile: t('platMobile'), 'Web & Mobile': t('platBoth') }[p] || p);
   const categoryLabel = (c) => ({ Bug: t('catBug'), Amélioration: t('catImprovement'), 'Nouvelle fonctionnalité': t('catFeature') }[c] || c);
 
@@ -163,6 +163,7 @@ export default function Dashboard() {
               <option value="">{t('allStatuses')}</option>
               <option value="Ouvert">{t('statusOpen')}</option>
               <option value="En cours">{t('statusProgress')}</option>
+              <option value="Dev terminé">{t('statusDevDone')}</option>
               <option value="En test">{t('statusTest')}</option>
               <option value="Bloqué">{t('statusBlocked')}</option>
               <option value="Résolu">{t('statusResolved')}</option>
@@ -228,7 +229,7 @@ export default function Dashboard() {
                               <button className="action-menu-item" onClick={() => { setViewingBug(bug); setOpenMenuId(null); }}>
                                 <Eye size={14} /> {t('actionView')}
                               </button>
-                              {canEdit && bug.status !== 'Résolu' && (
+                              {canEdit && bug.status === 'Dev terminé' && (
                                 <button className="action-menu-item" onClick={() => { setTestingBug(bug); setOpenMenuId(null); }}>
                                   <FlaskConical size={14} /> {t('sendToTest')}
                                 </button>

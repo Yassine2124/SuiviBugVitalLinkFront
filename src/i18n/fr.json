@@ -91,5 +91,9 @@
   "selectAtLeastOneTester": "Sélectionne au moins un testeur",
   "adminLabel": "(admin)",
   "testers": "Testeurs",
-  "preview": "Aperçu"
+  "preview": "Aperçu",
+  "statusDevDone": "Dev terminé",
+  "copy": "Copier",
+  "copied": "Copié",
+  "by": "par"
 }

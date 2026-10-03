@@ -1,4 +1,4 @@
-import { Bug, LayoutDashboard, Users, X } from 'lucide-react';
+import { Bug, LayoutDashboard, Users, X, FolderOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -28,6 +28,9 @@ export default function Sidebar({ open, onClose }) {
         <div className="sidebar-nav">
           <Link to="/dashboard" className={`sidebar-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={onClose}>
             <LayoutDashboard size={17} /> {t('sidebarBugs')}
+          </Link>
+          <Link to="/documents" className={`sidebar-link ${location.pathname === '/documents' ? 'active' : ''}`} onClick={onClose}>
+            <FolderOpen size={17} /> Documents
           </Link>
           {user?.role === 'admin' && (
             <Link to="/admin" className={`sidebar-link ${location.pathname === '/admin' ? 'active' : ''}`} onClick={onClose}>

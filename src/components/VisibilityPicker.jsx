@@ -2,27 +2,26 @@ import { useEffect, useState } from 'react';
 import { Lock, Globe, Users, Check } from 'lucide-react';
 import api from '../api/axios';
 
-export default function VisibilityPicker({ visibility, allowedUsers, onChange }) {
+export default function VisibilityPicker({ visibility, allowedUsers, publicCanContribute, onChange }) {
   const [members, setMembers] = useState([]);
 
   useEffect(() => {
     api.get('/auth/team').then(res => setMembers(res.data)).catch(() => {});
   }, []);
 
-  const setVisibility = (v) => onChange({ visibility: v, allowedUsers: v === 'Restreint' ? allowedUsers : [] });
+  const setVisibility = (v) => onChange({ visibility: v, allowedUsers: v === 'Restreint' ? allowedUsers : [], publicCanContribute: v === 'Public' ? publicCanContribute : false });
 
   const toggleUser = (userId) => {
     const exists = allowedUsers.find(u => u.userId === userId);
-    if (exists) {
-      onChange({ visibility, allowedUsers: allowedUsers.filter(u => u.userId !== userId) });
-    } else {
-      onChange({ visibility, allowedUsers: [...allowedUsers, { userId, role: 'Lecteur' }] });
-    }
+    const updated = exists ? allowedUsers.filter(u => u.userId !== userId) : [...allowedUsers, { userId, role: 'Lecteur' }];
+    onChange({ visibility, allowedUsers: updated, publicCanContribute });
   };
 
   const setRole = (userId, role) => {
-    onChange({ visibility, allowedUsers: allowedUsers.map(u => u.userId === userId ? { ...u, role } : u) });
+    onChange({ visibility, allowedUsers: allowedUsers.map(u => u.userId === userId ? { ...u, role } : u), publicCanContribute });
   };
+
+  const setPublicContribute = (value) => onChange({ visibility, allowedUsers, publicCanContribute: value });
 
   return (
     <div>
@@ -37,6 +36,17 @@ export default function VisibilityPicker({ visibility, allowedUsers, onChange })
           <Users size={14} /> Restreint
         </button>
       </div>
+
+      {visibility === 'Public' && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <button type="button" onClick={() => setPublicContribute(false)} className={!publicCanContribute ? 'btn' : 'btn-outline'} style={{ flex: 1, fontSize: 12.5, padding: '8px' }}>
+            Lecture seule
+          </button>
+          <button type="button" onClick={() => setPublicContribute(true)} className={publicCanContribute ? 'btn' : 'btn-outline'} style={{ flex: 1, fontSize: 12.5, padding: '8px' }}>
+            Contribution libre
+          </button>
+        </div>
+      )}
 
       {visibility === 'Restreint' && (
         <div style={{ border: '1px solid #e0e0dc', borderRadius: 10, padding: 10, maxHeight: 200, overflowY: 'auto' }}>

@@ -7,6 +7,7 @@ export default function CreateFolderModal({ parentId, onClose, onCreated }) {
   const [name, setName] = useState('');
   const [visibility, setVisibility] = useState('Privé');
   const [allowedUsers, setAllowedUsers] = useState([]);
+  const [publicCanContribute, setPublicCanContribute] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +16,7 @@ export default function CreateFolderModal({ parentId, onClose, onCreated }) {
     setError('');
     setLoading(true);
     try {
-      await api.post('/folders', { name, parent: parentId || null, visibility, allowedUsers });
+      await api.post('/folders', { name, parent: parentId || null, visibility, allowedUsers, publicCanContribute });
       onCreated();
     } catch (err) {
       setError(err.response?.data?.error || 'Erreur');
@@ -40,7 +41,10 @@ export default function CreateFolderModal({ parentId, onClose, onCreated }) {
             <label className="field-label-icon">Nom du dossier</label>
             <input className="input" value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Contrats" required />
             <label className="field-label-icon">Visibilité</label>
-            <VisibilityPicker visibility={visibility} allowedUsers={allowedUsers} onChange={({ visibility, allowedUsers }) => { setVisibility(visibility); setAllowedUsers(allowedUsers); }} />
+            <VisibilityPicker
+              visibility={visibility} allowedUsers={allowedUsers} publicCanContribute={publicCanContribute}
+              onChange={(v) => { setVisibility(v.visibility); setAllowedUsers(v.allowedUsers); setPublicCanContribute(v.publicCanContribute); }}
+            />
           </div>
           <div className="modal-footer">
             <button type="button" className="btn-outline" style={{ flex: 1 }} onClick={onClose}>Annuler</button>

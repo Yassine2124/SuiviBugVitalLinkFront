@@ -8,6 +8,7 @@ export default function UploadDocModal({ folderId, onClose, onUploaded }) {
   const [name, setName] = useState('');
   const [visibility, setVisibility] = useState('Privé');
   const [allowedUsers, setAllowedUsers] = useState([]);
+  const [publicCanContribute, setPublicCanContribute] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +28,7 @@ export default function UploadDocModal({ folderId, onClose, onUploaded }) {
       await api.post('/documents', {
         name, folder: folderId || null, fileUrl: uploaded.url,
         fileType: uploaded.fileType, fileSize: uploaded.fileSize,
-        visibility, allowedUsers
+        visibility, allowedUsers, publicCanContribute
       });
       onUploaded();
     } catch (err) {
@@ -55,7 +56,10 @@ export default function UploadDocModal({ folderId, onClose, onUploaded }) {
             <label className="field-label-icon">Nom affiché</label>
             <input className="input" value={name} onChange={e => setName(e.target.value)} required />
             <label className="field-label-icon">Visibilité</label>
-            <VisibilityPicker visibility={visibility} allowedUsers={allowedUsers} onChange={({ visibility, allowedUsers }) => { setVisibility(visibility); setAllowedUsers(allowedUsers); }} />
+            <VisibilityPicker
+              visibility={visibility} allowedUsers={allowedUsers} publicCanContribute={publicCanContribute}
+              onChange={(v) => { setVisibility(v.visibility); setAllowedUsers(v.allowedUsers); setPublicCanContribute(v.publicCanContribute); }}
+            />
           </div>
           <div className="modal-footer">
             <button type="button" className="btn-outline" style={{ flex: 1 }} onClick={onClose}>Annuler</button>

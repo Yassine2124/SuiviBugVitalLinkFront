@@ -97,7 +97,7 @@ export default function ItemDetailsModal({ item, type, onClose, onUpdated, curre
           <button className="btn-outline" style={{ flex: 1 }} onClick={onClose}>Fermer</button>
           {canEdit && (
             <button className="btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={handleSave} disabled={loading}>
-              <Save size={15} /> {loading ? '...' : 'Enregistrer'}
+              {loading ? <span className="spinner" /> : <Save size={15} />} {loading ? '' : 'Enregistrer'}
             </button>
           )}
         </div>

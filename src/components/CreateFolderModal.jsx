@@ -48,7 +48,9 @@ export default function CreateFolderModal({ parentId, onClose, onCreated }) {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn-outline" style={{ flex: 1 }} onClick={onClose}>Annuler</button>
-            <button type="submit" className="btn" style={{ flex: 1 }} disabled={loading}>{loading ? '...' : 'Créer'}</button>
+            <button type="submit" className="btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} disabled={loading}>
+              {loading && <span className="spinner" />} {loading ? '' : 'Ajouter'}
+            </button>
           </div>
         </form>
       </div>

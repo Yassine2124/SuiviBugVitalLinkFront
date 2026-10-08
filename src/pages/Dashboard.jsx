@@ -12,6 +12,7 @@ export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const [bugs, setBugs] = useState([]);
+  const [loadingBugs, setLoadingBugs] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [viewingBug, setViewingBug] = useState(null);
   const [selectedBug, setSelectedBug] = useState(null);
@@ -25,7 +26,8 @@ export default function Dashboard() {
   const menuRef = useRef(null);
 
   const fetchBugs = () => {
-    api.get('/bugs').then(res => setBugs(res.data)).catch(err => console.error(err));
+    setLoadingBugs(true);
+    api.get('/bugs').then(res => setBugs(res.data)).catch(err => console.error(err)).finally(() => setLoadingBugs(false));
   };
 
   useEffect(() => { fetchBugs(); }, []);
@@ -251,8 +253,16 @@ export default function Dashboard() {
                     </tr>
                   );
                 })}
-                {filtered.length === 0 && (
+                {!loadingBugs && filtered.length === 0 && (
                   <tr><td colSpan={13} style={{ textAlign: 'center', color: '#999', padding: 30 }}>{t('noResults')}</td></tr>
+                )}
+                {loadingBugs && (
+                  <tr><td colSpan={13}>
+                    <div className="table-loading">
+                      <span className="spinner spinner-dark" />
+                      Chargement...
+                    </div>
+                  </td></tr>
                 )}
               </tbody>
             </table>

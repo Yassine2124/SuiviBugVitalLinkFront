@@ -47,8 +47,8 @@ export default function Register() {
           <label className="field-label">{t('password')}</label>
           <input type="password" className="input" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
 
-          <button type="submit" className="btn" style={{ width: '100%', marginTop: 6 }} disabled={loading}>
-            {loading ? '...' : t('submit')}
+          <button type="submit" className="btn" style={{ width: '100%', marginTop: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} disabled={loading}>
+            {loading && <span className="spinner" />} {loading ? '' : t('submit')}
           </button>
         </form>
 

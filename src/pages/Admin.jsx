@@ -8,17 +8,26 @@ export default function Admin() {
   const { t } = useTranslation();
   const [pending, setPending] = useState([]);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [approvingId, setApprovingId] = useState(null);
 
   const fetchData = () => {
-    api.get('/auth/pending').then(res => setPending(res.data));
-    api.get('/auth/users').then(res => setUsers(res.data));
+    setLoading(true);
+    Promise.all([
+      api.get('/auth/pending').then(res => setPending(res.data)),
+      api.get('/auth/users').then(res => setUsers(res.data))
+    ]).finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchData(); }, []);
 
+
+
   const approve = async (id) => {
+    setApprovingId(id);
     await api.put(`/auth/approve/${id}`);
+    setApprovingId(null);
     fetchData();
   };
 
@@ -54,8 +63,8 @@ export default function Admin() {
                     <div style={{ fontWeight: 500 }}>{u.name}</div>
                     <div style={{ fontSize: 13, color: '#666' }}>{u.email}</div>
                   </div>
-                  <button className="btn" onClick={() => approve(u._id)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Check size={15} /> {t('approve')}
+                  <button className="btn" onClick={() => approve(u._id)} style={{ display: 'flex', alignItems: 'center', gap: 6 }} disabled={approvingId === u._id}>
+                    {approvingId === u._id ? <span className="spinner" /> : <Check size={15} />} {approvingId === u._id ? '' : t('approve')}
                   </button>
                 </div>
               ))}
@@ -74,7 +83,12 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {users.map(u => (
+                {loading && (
+                  <tr><td colSpan={5}>
+                    <div className="table-loading"><span className="spinner spinner-dark" />Chargement...</div>
+                  </td></tr>
+                )}
+                {!loading && users.map(u => (
                   <tr key={u._id}>
                     <td>
                       <div className="row-title">{u.name}</div>
@@ -87,7 +101,7 @@ export default function Admin() {
                     ))}
                   </tr>
                 ))}
-                {users.length === 0 && (
+                {!loading && users.length === 0 && (
                   <tr><td colSpan={5} style={{ textAlign: 'center', color: '#999', padding: 30 }}>{t('noUsers')}</td></tr>
                 )}
               </tbody>

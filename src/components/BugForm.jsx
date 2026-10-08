@@ -6,6 +6,7 @@ import api, { uploadImage } from '../api/axios';
 export default function BugForm({ bug, onCreated, onClose }) {
   const { t } = useTranslation();
   const [members, setMembers] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(true);
   const [form, setForm] = useState(bug ? {
     taskId: bug.taskId, title: bug.title, description: bug.description || '',
     category: bug.category, platform: bug.platform, priority: bug.priority,
@@ -21,7 +22,7 @@ export default function BugForm({ bug, onCreated, onClose }) {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    api.get('/auth/team').then(res => setMembers(res.data)).catch(() => {});
+    api.get('/auth/team').then(res => setMembers(res.data)).catch(() => {}).finally(() => setMembersLoading(false));
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -93,8 +94,8 @@ export default function BugForm({ bug, onCreated, onClose }) {
               </div>
             ) : (
               <div style={{ marginBottom: 14 }}>
-                <input type="file" accept="image/*" onChange={handleFileChange} className="input" style={{ padding: 8 }} />
-                {uploading && <p style={{ fontSize: 12, color: '#777', margin: '4px 0 0' }}>{t('uploading')}</p>}
+                <input type="file" accept="image/*" onChange={handleFileChange} className="input" style={{ padding: 8 }} disabled={uploading} />
+                {uploading && <p style={{ fontSize: 12, color: '#777', margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6 }}><span className="spinner spinner-dark" /> {t('uploading')}</p>}
               </div>
             )}
 
@@ -158,16 +159,22 @@ export default function BugForm({ bug, onCreated, onClose }) {
             </div>
 
             <label className="field-label-icon"><User size={15} /> {t('assignedTo')}</label>
-            <select className="input" name="assignedTo" value={form.assignedTo} onChange={handleChange} style={{ marginBottom: 0 }}>
-              <option value="">—</option>
-              {members.map(m => <option key={m._id} value={m.name}>{m.name}</option>)}
-            </select>
+            {membersLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#777', padding: '10px 0' }}>
+                <span className="spinner spinner-dark" /> Chargement des membres...
+              </div>
+            ) : (
+              <select className="input" name="assignedTo" value={form.assignedTo} onChange={handleChange} style={{ marginBottom: 0 }}>
+                <option value="">—</option>
+                {members.map(m => <option key={m._id} value={m.name}>{m.name}</option>)}
+              </select>
+            )}
           </div>
 
           <div className="modal-footer">
             <button type="button" className="btn-outline" style={{ flex: 1 }} onClick={onClose}>{t('cancel')}</button>
             <button type="submit" className="btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#4338ca' }} disabled={loading || uploading}>
-              <Send size={15} /> {loading ? '...' : (bug ? t('saveBug') : t('createBug'))}
+              {loading ? <span className="spinner" /> : <Send size={15} />} {loading ? '' : (bug ? t('saveBug') : t('createBug'))}
             </button>
           </div>
           {bug && (

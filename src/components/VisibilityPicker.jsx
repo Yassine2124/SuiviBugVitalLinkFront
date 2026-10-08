@@ -4,9 +4,10 @@ import api from '../api/axios';
 
 export default function VisibilityPicker({ visibility, allowedUsers, publicCanContribute, onChange }) {
   const [members, setMembers] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/auth/team').then(res => setMembers(res.data)).catch(() => {});
+    api.get('/auth/team').then(res => setMembers(res.data)).catch(() => {}).finally(() => setMembersLoading(false));
   }, []);
 
   const setVisibility = (v) => onChange({ visibility: v, allowedUsers: v === 'Restreint' ? allowedUsers : [], publicCanContribute: v === 'Public' ? publicCanContribute : false });
@@ -49,28 +50,32 @@ export default function VisibilityPicker({ visibility, allowedUsers, publicCanCo
       )}
 
       {visibility === 'Restreint' && (
-        <div style={{ border: '1px solid #e0e0dc', borderRadius: 10, padding: 10, maxHeight: 200, overflowY: 'auto' }}>
-          {members.map(m => {
-            const entry = allowedUsers.find(u => u.userId === m._id);
-            return (
-              <div key={m._id} className="user-pick-row">
-                <div onClick={() => toggleUser(m._id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flex: 1 }}>
-                  <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${entry ? '#4338ca' : '#ccc'}`, background: entry ? '#4338ca' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {entry && <Check size={10} color="white" />}
+        membersLoading ? (
+          <div className="table-loading" style={{ padding: 20 }}><span className="spinner spinner-dark" /> Chargement...</div>
+        ) : (
+          <div style={{ border: '1px solid #e0e0dc', borderRadius: 10, padding: 10, maxHeight: 200, overflowY: 'auto' }}>
+            {members.map(m => {
+              const entry = allowedUsers.find(u => u.userId === m._id);
+              return (
+                <div key={m._id} className="user-pick-row">
+                  <div onClick={() => toggleUser(m._id)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flex: 1 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${entry ? '#4338ca' : '#ccc'}`, background: entry ? '#4338ca' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {entry && <Check size={10} color="white" />}
+                    </div>
+                    {m.name}
                   </div>
-                  {m.name}
+                  {entry && (
+                    <select value={entry.role} onChange={e => setRole(m._id, e.target.value)} style={{ fontSize: 12, padding: '3px 6px', borderRadius: 6, border: '1px solid #e0e0dc' }}>
+                      <option value="Lecteur">Lecteur</option>
+                      <option value="Contributeur">Contributeur</option>
+                    </select>
+                  )}
                 </div>
-                {entry && (
-                  <select value={entry.role} onChange={e => setRole(m._id, e.target.value)} style={{ fontSize: 12, padding: '3px 6px', borderRadius: 6, border: '1px solid #e0e0dc' }}>
-                    <option value="Lecteur">Lecteur</option>
-                    <option value="Contributeur">Contributeur</option>
-                  </select>
-                )}
-              </div>
-            );
-          })}
-          {members.length === 0 && <p style={{ fontSize: 12, color: '#999', margin: 0 }}>Aucun membre.</p>}
-        </div>
+              );
+            })}
+            {members.length === 0 && <p style={{ fontSize: 12, color: '#999', margin: 0 }}>Aucun membre.</p>}
+          </div>
+        )
       )}
     </div>
   );

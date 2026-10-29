@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -11,13 +11,17 @@ export function AuthProvider({ children }) {
   });
   const [token, setToken] = useState(() => localStorage.getItem('token'));
 
- const login = async (email, password) => {
-  const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-  setUser(res.data.user);
-  setToken(res.data.token);
-  localStorage.setItem('user', JSON.stringify(res.data.user));
-  localStorage.setItem('token', res.data.token);
-};
+  const persistUser = (u) => {
+    setUser(u);
+    localStorage.setItem('user', JSON.stringify(u));
+  };
+
+  const login = async (email, password) => {
+    const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+    persistUser(res.data.user);
+    setToken(res.data.token);
+    localStorage.setItem('token', res.data.token);
+  };
 
   const register = async (name, email, password) => {
     await axios.post(`${API_URL}/auth/register`, { name, email, password });
@@ -29,6 +33,15 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
   };
+
+  useEffect(() => {
+    if (!token) return;
+    axios.get(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => persistUser(res.data))
+      .catch(err => {
+        if (err.response?.status === 401) logout();
+      });
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, register, logout }}>

@@ -7,6 +7,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import Documents from './pages/Documents';
+import AttendanceSettings from './pages/AttendanceSettings';
+import Attendance from './pages/Attendance';
+import AttendanceReport from './pages/AttendanceReport';
 import './i18n';
 
 function GuestRoute({ children }) {
@@ -24,6 +27,9 @@ function AppRoutes() {
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
       <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+      <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
+      <Route path="/attendance/settings" element={<AdminRoute><AttendanceSettings /></AdminRoute>} />
+      <Route path="/attendance/report" element={<AdminRoute><AttendanceReport /></AdminRoute>} />
       <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} />} />
     </Routes>
   );
